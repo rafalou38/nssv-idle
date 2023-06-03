@@ -63,7 +63,8 @@
   }
 
   onMount(() => {
-    e.addEventListener("pan", pan);
+    // @ts-ignore
+    e.addEventListener("pan", pan); // @ts-ignore
     e.addEventListener("touch", onTouch);
   });
 </script>

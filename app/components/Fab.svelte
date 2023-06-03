@@ -11,7 +11,6 @@
   gridViewport.subscribe((viewport) => {
     top = viewport.height - 56 - margin;
     left = viewport.width - 56 - margin;
-    console.log(viewport, "updates");
   });
 </script>
 

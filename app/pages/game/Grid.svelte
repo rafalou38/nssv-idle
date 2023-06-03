@@ -39,8 +39,8 @@
   }
 
   onMount(() => {
-    if (!container) return;
-    container.addEventListener("pan", pan);
+    if (!container) return; // @ts-ignore
+    container.addEventListener("pan", pan); // @ts-ignore
     container.addEventListener("touch", touch);
 
     interval = setInterval(() => {
