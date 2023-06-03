@@ -5,20 +5,23 @@
   } from "@nativescript/core";
   import { onMount } from "svelte";
   import { FlexboxLayoutElement } from "svelte-native/dom";
+  import { Vector2 } from "~/utils/Math";
+  import { draggingNode } from "./stores";
 
+  export let delta = new Vector2();
   export let x = 0;
   export let y = 0;
   export let unit = 25;
 
   let e: FlexboxLayoutElement;
+  let id = Math.random();
 
-  export let dragging = false;
   let dx = 0;
   let dy = 0;
 
   function startDrag() {
     console.log("Dragg start");
-    dragging = true;
+    $draggingNode = id;
   }
   function endDrag() {
     x += dx;
@@ -26,7 +29,7 @@
   }
 
   function pan(e: PanGestureEventData) {
-    if (dragging) {
+    if ($draggingNode) {
       dx = Math.round(e.deltaX / unit) * unit;
       dy = Math.round(e.deltaY / unit) * unit;
     }
@@ -42,13 +45,15 @@
         break;
 
       case "move":
-        if (dragging) return;
+        if ($draggingNode) return;
       case "up":
         endDrag();
       case "cancel":
         dx = 0;
         dy = 0;
-        dragging = false;
+        setTimeout(() => {
+          $draggingNode = 0;
+        }, 100);
         if (timeout) clearTimeout(timeout);
         break;
 
@@ -65,14 +70,14 @@
 
 <flexboxLayout
   class="node"
-  class:node--drag={dragging}
-  top={y + dy + "dp"}
-  left={x + dx + "dp"}
+  class:node--drag={$draggingNode == id}
+  top={delta.y + y + dy + "dp"}
+  left={delta.x + x + dx + "dp"}
   onpan={console.log}
   bind:this={e}
 >
   <flexboxLayout class="main">
-    <label text={dragging + ""} />
+    <label text={$draggingNode + ""} />
   </flexboxLayout>
   <flexboxLayout class="upgrade">
     <label class="fas" text="&#xf07a;" />
