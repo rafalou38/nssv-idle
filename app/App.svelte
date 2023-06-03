@@ -1,7 +1,13 @@
-<frame>
-    <Home />
+<script lang="ts">
+  import Game from "./pages/game/Game.svelte";
+</script>
+
+<frame class="root">
+  <Game />
 </frame>
 
-<script lang="ts">
-    import Home from './components/Home.svelte'
-</script>
+<style>
+  .root {
+    background-color: #151515;
+  }
+</style>
