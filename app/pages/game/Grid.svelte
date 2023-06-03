@@ -4,6 +4,7 @@
   import {} from "svelte-native";
   import Fab from "~/components/Fab.svelte";
   import { gridViewport } from "./stores";
+  import Node from "./Node.svelte";
 
   let container: AbsoluteLayoutElement;
   let interval: NodeJS.Timeout;
@@ -25,17 +26,9 @@
 </script>
 
 <absoluteLayout row={1} col={0} bind:this={container}>
-  <label left="120" />
+  <Node />
   <Fab />
 </absoluteLayout>
 
 <style>
-  label {
-    background: #4a6551;
-    border-radius: 8px;
-    width: 512px;
-    height: 200px;
-    position: absolute;
-    bottom: 0;
-  }
 </style>
