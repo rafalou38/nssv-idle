@@ -48,7 +48,6 @@
         let { width, height } = container?.nativeView?.getActualSize();
         if (width && height) {
           clearInterval(interval);
-          console.log($gridViewport);
           $gridViewport = { width, height };
         }
       } catch (error) {
@@ -60,6 +59,43 @@
       clearInterval(interval);
     };
   });
+
+  const approachIntervals = new Map<string, NodeJS.Timeout>();
+
+  $: {
+    for (const nodeA of $ownedNodes) {
+      let nearest = Infinity;
+      let nearestPos = new Vector2();
+      for (const nodeB of $ownedNodes) {
+        if (nodeA == nodeB) continue;
+        const dist = nodeA.position.to(nodeB.position).norm();
+        if (dist < nearest) {
+          nearest = dist;
+          nearestPos = nodeB.position;
+        }
+      }
+
+      if (!approachIntervals.has(nodeA.id)) {
+        const index = $ownedNodes.indexOf(nodeA);
+
+        const approach = (target: Vector2) => {
+          if (nodeA.position.to(target).norm() < 300) {
+            clearInterval(approachIntervals.get(nodeA.id));
+            approachIntervals.delete(nodeA.id);
+
+            return;
+          }
+
+          $ownedNodes[index].position = nodeA.position.lerp(target, 0.01);
+        };
+
+        approachIntervals.set(
+          nodeA.id,
+          setInterval(approach.bind(null, nearestPos), 25)
+        );
+      }
+    }
+  }
 </script>
 
 <absoluteLayout

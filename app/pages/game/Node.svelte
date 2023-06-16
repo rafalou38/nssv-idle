@@ -8,7 +8,7 @@
   import { Vector2 } from "~/utils/Math";
   import { draggingNode } from "./stores";
   import type { NodeData } from "./types";
-  import { saveNodePosition } from "~/databases/Nodes";
+  import { ownedNodes, saveNodePosition } from "~/databases/Nodes";
 
   export let data: NodeData;
   export let delta = new Vector2();
@@ -20,13 +20,26 @@
   let timeout: NodeJS.Timeout | null = null;
 
   function startDrag() {
-    console.log("Drag start");
     $draggingNode = data.id;
   }
 
   function endDrag() {
-    data.position.x = Math.round((data.position.x + dx) / unit) * unit;
-    data.position.y = Math.round((data.position.y + dy) / unit) * unit;
+    const nx = Math.round((data.position.x + dx) / unit) * unit;
+    const ny = Math.round((data.position.y + dy) / unit) * unit;
+
+    for (const other of $ownedNodes) {
+      if (other == data) continue;
+
+      const xOverlap = Math.abs(other.position.x - nx) < 181;
+      const yOverlap = Math.abs(other.position.y - ny) < 61;
+
+      if (xOverlap && yOverlap) {
+        return;
+      }
+    }
+
+    data.position.x = nx;
+    data.position.y = ny;
     saveNodePosition(data.id, data.position);
   }
 
@@ -40,7 +53,6 @@
   function onTouch(e: TouchGestureEventData) {
     switch (e.action) {
       case "down":
-        console.log("Start timeout");
         if (timeout) clearTimeout(timeout);
         timeout = setTimeout(startDrag, 200);
         break;
