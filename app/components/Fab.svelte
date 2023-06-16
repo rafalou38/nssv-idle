@@ -1,6 +1,6 @@
 <script lang="ts">
   import { screen } from "@nativescript/core/platform";
-  import { onMount } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import { AbsoluteLayoutElement } from "svelte-native/dom";
   import { gridViewport } from "~/pages/game/stores";
 
@@ -12,10 +12,19 @@
     top = viewport.height - 56 - margin;
     left = viewport.width - 56 - margin;
   });
+
+  const dispatch = createEventDispatcher();
 </script>
 
 {#if top && left}
-  <button class="fas" text="&#xf07a;" {top} {left} androidElevation={0} />
+  <button
+    class="fas"
+    text="&#xf07a;"
+    {top}
+    {left}
+    androidElevation={0}
+    on:tap={(e) => dispatch("tap", e)}
+  />
 {/if}
 
 <style>

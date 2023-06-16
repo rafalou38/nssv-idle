@@ -1,9 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { AbsoluteLayoutElement } from "svelte-native/dom";
-  import {} from "svelte-native";
   import Fab from "~/components/Fab.svelte";
-  import { draggingNode, gridViewport } from "./stores";
+  import { draggingNode, gridViewport, ownedNodes } from "./stores";
   import Node from "./Node.svelte";
   import {
     PanGestureEventData,
@@ -13,7 +12,6 @@
 
   let container: AbsoluteLayoutElement;
   let interval: NodeJS.Timeout;
-
   let cam_pos = new Vector2();
   let delta_pos = new Vector2();
 
@@ -32,15 +30,12 @@
         delta_pos.x = 0;
         delta_pos.y = 0;
         break;
-
-      default:
-        break;
     }
   }
 
   onMount(() => {
-    if (!container) return; // @ts-ignore
-    container.addEventListener("pan", pan); // @ts-ignore
+    if (!container) return;
+    container.addEventListener("pan", pan);
     container.addEventListener("touch", touch);
 
     interval = setInterval(() => {
@@ -49,30 +44,44 @@
         if (width && height) {
           clearInterval(interval);
           console.log($gridViewport);
-          $gridViewport = {
-            width,
-            height,
-          };
+          $gridViewport = { width, height };
         }
       } catch (error) {
         clearInterval(interval);
       }
     }, 100);
+
+    return () => {
+      clearInterval(interval);
+    };
   });
 </script>
 
 <absoluteLayout
-  top={cam_pos.y + delta_pos.y + "dp"}
-  left={cam_pos.x + delta_pos.x + "dp"}
+  top={`${cam_pos.y + delta_pos.y}dp`}
+  left={`${cam_pos.x + delta_pos.x}dp`}
   bind:this={container}
   row={1}
   col={0}
   class="grid"
 >
-  <Node delta={cam_pos.copy().add(delta_pos)} />
-  <Node delta={cam_pos.copy().add(delta_pos)} y={100} />
-  <Fab />
+  {#each $ownedNodes as node (node.id)}
+    <Node delta={cam_pos.copy().add(delta_pos)} data={node} />
+  {/each}
+  <Fab
+    on:tap={() =>
+      ($ownedNodes = [
+        ...$ownedNodes,
+        {
+          id: Math.random().toString(16),
+          level: 1,
+          position: new Vector2(0, 0),
+          type: "basic",
+        },
+      ])}
+  />
 </absoluteLayout>
 
 <style>
+  /* Add your styles here */
 </style>

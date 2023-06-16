@@ -7,25 +7,25 @@
   import { FlexboxLayoutElement } from "svelte-native/dom";
   import { Vector2 } from "~/utils/Math";
   import { draggingNode } from "./stores";
+  import type { NodeData } from "./types";
 
+  export let data: NodeData;
   export let delta = new Vector2();
-  export let x = 0;
-  export let y = 0;
   export let unit = 25;
 
   let e: FlexboxLayoutElement;
-  let id = Math.random();
-
   let dx = 0;
   let dy = 0;
+  let timeout: NodeJS.Timeout | null = null;
 
   function startDrag() {
-    console.log("Dragg start");
-    $draggingNode = id;
+    console.log("Drag start");
+    $draggingNode = data.id;
   }
+
   function endDrag() {
-    x += dx;
-    y += dy;
+    data.position.x += dx;
+    data.position.y += dy;
   }
 
   function pan(e: PanGestureEventData) {
@@ -35,11 +35,10 @@
     }
   }
 
-  let timeout: NodeJS.Timeout | null = null;
   function onTouch(e: TouchGestureEventData) {
     switch (e.action) {
       case "down":
-        console.log("start timeout");
+        console.log("Start timeout");
         if (timeout) clearTimeout(timeout);
         timeout = setTimeout(startDrag, 200);
         break;
@@ -52,7 +51,7 @@
         dx = 0;
         dy = 0;
         setTimeout(() => {
-          $draggingNode = 0;
+          $draggingNode = null;
         }, 100);
         if (timeout) clearTimeout(timeout);
         break;
@@ -63,18 +62,20 @@
   }
 
   onMount(() => {
-    // @ts-ignore
-    e.addEventListener("pan", pan); // @ts-ignore
+    e.addEventListener("pan", pan);
     e.addEventListener("touch", onTouch);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   });
 </script>
 
 <flexboxLayout
   class="node"
-  class:node--drag={$draggingNode == id}
-  top={delta.y + y + dy + "dp"}
-  left={delta.x + x + dx + "dp"}
-  onpan={console.log}
+  class:node--drag={$draggingNode == data.id}
+  top={`${delta.y + data.position.y + dy}dp`}
+  left={`${delta.x + data.position.x + dx}dp`}
   bind:this={e}
 >
   <flexboxLayout class="main">
@@ -94,13 +95,16 @@
     border-radius: 8px;
     width: 200dp;
   }
+
   .node--drag {
     transform: scale(1.2);
   }
+
   .main {
     flex-grow: 1;
     flex-direction: row;
   }
+
   .upgrade {
     flex-direction: column;
     align-items: center;
