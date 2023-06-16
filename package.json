@@ -6,6 +6,7 @@
   "dependencies": {
     "@nativescript/core": "~8.5.0",
     "@nativescript/theme": "~3.0.2",
+    "@triniwiz/nativescript-couchbase": "^1.4.0",
     "svelte-native": "~1.0.0"
   },
   "devDependencies": {

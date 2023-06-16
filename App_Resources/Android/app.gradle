@@ -8,8 +8,13 @@ android {
   // buildToolsVersion "32.0.0"
   // ndkVersion ""
 
+  // compileOptions {
+  //       targetCompatibility 1.8
+  //       sourceCompatibility 1.8
+  //   }
+
   defaultConfig {
-    minSdkVersion 17
+    minSdkVersion 22
     // targetSdkVersion 32
 
     // Version Information

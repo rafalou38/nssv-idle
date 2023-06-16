@@ -2,13 +2,14 @@
   import { onMount } from "svelte";
   import { AbsoluteLayoutElement } from "svelte-native/dom";
   import Fab from "~/components/Fab.svelte";
-  import { draggingNode, gridViewport, ownedNodes } from "./stores";
+  import { draggingNode, gridViewport } from "./stores";
   import Node from "./Node.svelte";
   import {
     PanGestureEventData,
     TouchGestureEventData,
   } from "@nativescript/core";
   import { Vector2 } from "~/utils/Math";
+  import { addNode, ownedNodes } from "~/databases/Nodes";
 
   let container: AbsoluteLayoutElement;
   let interval: NodeJS.Timeout;
@@ -68,18 +69,7 @@
   {#each $ownedNodes as node (node.id)}
     <Node delta={cam_pos.copy().add(delta_pos)} data={node} />
   {/each}
-  <Fab
-    on:tap={() =>
-      ($ownedNodes = [
-        ...$ownedNodes,
-        {
-          id: Math.random().toString(16),
-          level: 1,
-          position: new Vector2(0, 0),
-          type: "basic",
-        },
-      ])}
-  />
+  <Fab on:tap={() => addNode("basic")} />
 </absoluteLayout>
 
 <style>

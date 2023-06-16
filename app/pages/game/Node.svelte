@@ -8,10 +8,11 @@
   import { Vector2 } from "~/utils/Math";
   import { draggingNode } from "./stores";
   import type { NodeData } from "./types";
+  import { saveNodePosition } from "~/databases/Nodes";
 
   export let data: NodeData;
   export let delta = new Vector2();
-  export let unit = 25;
+  export let unit = 10;
 
   let e: FlexboxLayoutElement;
   let dx = 0;
@@ -24,8 +25,9 @@
   }
 
   function endDrag() {
-    data.position.x += dx;
-    data.position.y += dy;
+    data.position.x = Math.round((data.position.x + dx) / unit) * unit;
+    data.position.y = Math.round((data.position.y + dy) / unit) * unit;
+    saveNodePosition(data.id, data.position);
   }
 
   function pan(e: PanGestureEventData) {
@@ -79,7 +81,7 @@
   bind:this={e}
 >
   <flexboxLayout class="main">
-    <label text={$draggingNode + ""} />
+    <label text={"hello"} />
   </flexboxLayout>
   <flexboxLayout class="upgrade">
     <label class="fas" text="&#xf07a;" />
@@ -96,8 +98,16 @@
     width: 200dp;
   }
 
+  @keyframes elevate {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.05);
+    }
+  }
   .node--drag {
-    transform: scale(1.2);
+    animation: elevate 50ms ease-in forwards;
   }
 
   .main {
