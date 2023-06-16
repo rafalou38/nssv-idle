@@ -92,22 +92,12 @@
 <style>
   .node {
     padding: 10dp;
+    /* align-items: center; */
     background: #4a6551;
     color: white;
     border-radius: 8px;
-    width: 200dp;
-  }
-
-  @keyframes elevate {
-    from {
-      transform: scale(1);
-    }
-    to {
-      transform: scale(1.05);
-    }
-  }
-  .node--drag {
-    animation: elevate 50ms ease-in forwards;
+    width: 180dp;
+    height: 60dp;
   }
 
   .main {
@@ -121,7 +111,7 @@
     justify-content: center;
     background: #3d5443;
     border-radius: 8px;
-    height: 50dp;
-    width: 50dp;
+    font-size: 9.5dp;
+    width: 40dp;
   }
 </style>

@@ -10,11 +10,15 @@
   } from "@nativescript/core";
   import { Vector2 } from "~/utils/Math";
   import { addNode, ownedNodes } from "~/databases/Nodes";
+  import { Screen } from "@nativescript/core/platform";
+  const dpi = Screen.mainScreen.scale;
 
   let container: AbsoluteLayoutElement;
   let interval: NodeJS.Timeout;
   let cam_pos = new Vector2();
   let delta_pos = new Vector2();
+  let unit = 20;
+  let gridUnit = 20;
 
   function pan(e: PanGestureEventData) {
     if ($draggingNode) return;
@@ -64,14 +68,50 @@
   bind:this={container}
   row={1}
   col={0}
-  class="grid"
+  class=""
 >
+  <absoluteLayout
+    class="grid"
+    style="background-size: {gridUnit * dpi}px {gridUnit * dpi}px"
+    top={`${cam_pos.y + delta_pos.y}dp`}
+    left={`${cam_pos.x + delta_pos.x}dp`}
+    class:grid--visible={$draggingNode}
+  />
   {#each $ownedNodes as node (node.id)}
-    <Node delta={cam_pos.copy().add(delta_pos)} data={node} />
+    <Node delta={cam_pos.copy().add(delta_pos)} data={node} {unit} />
   {/each}
   <Fab on:tap={() => addNode("basic")} />
 </absoluteLayout>
 
 <style>
-  /* Add your styles here */
+  @keyframes fadeOut {
+    from {
+      opacity: 0.5;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.5;
+    }
+  }
+
+  .grid {
+    z-index: -1;
+    opacity: 0;
+    transform: translate(-1500dp, -1500dp);
+    width: 3000dp;
+    height: 3000dp;
+    background: url("~/assets/images/square.png");
+    animation: fadeOut 200ms linear forwards;
+  }
+
+  .grid--visible {
+    animation: fadeIn 200ms linear forwards;
+  }
 </style>
