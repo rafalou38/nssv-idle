@@ -7,6 +7,7 @@
   import {
     PanGestureEventData,
     TouchGestureEventData,
+    PinchGestureEventData,
   } from "@nativescript/core";
   import { Vector2 } from "~/utils/Math";
   import { addNode, ownedNodes } from "~/databases/Nodes";
@@ -15,33 +16,48 @@
 
   let container: AbsoluteLayoutElement;
   let interval: NodeJS.Timeout;
+
   let cam_pos = new Vector2();
   let delta_pos = new Vector2();
+
+  let scale = 1;
+  let deltaScale = 0;
+
   let unit = 20;
   let gridUnit = 20;
+  let fingers = 0;
 
   function pan(e: PanGestureEventData) {
     if ($draggingNode) return;
+    if (fingers != 1) return;
     delta_pos.x = e.deltaX;
     delta_pos.y = e.deltaY;
   }
 
   function touch(e: TouchGestureEventData) {
+    fingers = e.getPointerCount();
     switch (e.action) {
       case "up":
         cam_pos.x += delta_pos.x;
         cam_pos.y += delta_pos.y;
+        scale += deltaScale;
       case "cancel":
         delta_pos.x = 0;
         delta_pos.y = 0;
+        deltaScale = 0;
         break;
     }
+  }
+
+  function pinch(e: PinchGestureEventData) {
+    deltaScale = e.scale - 1;
   }
 
   onMount(() => {
     if (!container) return;
     container.addEventListener("pan", pan);
     container.addEventListener("touch", touch);
+    // container.addEventListener("pinch", pinch);
 
     interval = setInterval(() => {
       try {
@@ -105,6 +121,7 @@
   row={1}
   col={0}
   class=""
+  style="transform: scale({scale + deltaScale});"
 >
   <absoluteLayout
     class="grid"
